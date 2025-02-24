@@ -1,102 +1,106 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <cmath> // for ceil
-#include <algorithm> // for sort
-
+#include <cmath>
+#include <algorithm>
 using namespace std;
 
-// Function to merge k sorted parts using a priority queue
-vector<int> merge(const vector<vector<int>>& sortedParts) {
-    auto customCompare = [](const pair<int, int>& a, const pair<int, int>& b) {
-        return a.first > b.first;
+
+vector<int> mergeParts(vector<int>& arr, int k, int part_size, int low, int high) {
+    
+    auto customCompare = [&arr](int a, int b) {
+        return arr[a] > arr[b]; 
     };
+    priority_queue<int, vector<int>, decltype(customCompare)> pq(customCompare);
 
-    priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(customCompare)> pq(customCompare);
-
-    // Initialize the priority queue with the first element of each part
-    for (int i = 0; i < sortedParts.size(); i++) {
-        if (!sortedParts[i].empty()) {
-            pq.push({sortedParts[i][0], i});
+    // Push the starting indices of all k parts into the heap
+    for (int i = 0; i < k; i++) {
+        int startIdx = low + i * part_size;
+        if (startIdx < high) {
+            pq.push(startIdx);
         }
     }
 
-    vector<int> mergedArray;
-    vector<int> pointers(sortedParts.size(), 0); // Track the current index in each part
+    vector<int> tempSorted;
+    tempSorted.reserve(high - low);
 
+    // Merge
     while (!pq.empty()) {
-        auto [value, partIdx] = pq.top();
+        int topIndex = pq.top();
         pq.pop();
 
-        mergedArray.push_back(value);
+        tempSorted.push_back(arr[topIndex]);
+        int nextIdx = topIndex + 1;
 
-        // Move the pointer in the current part and push the next element into the queue
-        if (++pointers[partIdx] < sortedParts[partIdx].size()) {
-            pq.push({sortedParts[partIdx][pointers[partIdx]], partIdx});
+        // Check if the next index is within the same part and within bounds
+        if (nextIdx < low + ((topIndex - low) / part_size + 1) * part_size && nextIdx < high) {
+            pq.push(nextIdx);
         }
     }
 
-    return mergedArray;
+    return tempSorted;
 }
 
-// Function to perform k-way merge sort
-vector<int> mergeSort(const vector<int>& arr, int k, int low, int high) {
-    if (high - low <= 1) {
-        return vector<int>(arr.begin() + low, arr.begin() + high);
+void mergeSort(vector<int>& arr, int k, int low, int high) {
+    
+    int length = high - low;
+    // if (length <= 1) {
+    //     // Nothing to sort if subarray has 0 or 1 element
+    //     // return vector<int>(arr.begin() + low, arr.begin() + high);
+    //     return;
+    // }
+
+    int part_size = static_cast<int>(ceil((double)length / k));
+
+    //small case
+    if (part_size < k) {
+        sort(arr.begin() + low, arr.begin() + high);
+        // return vector<int>(arr.begin() + low, arr.begin() + high);
+        return;
     }
 
-    int part_size = ceil((double)(high - low) / k);
-    vector<vector<int>> sortedParts;
-
-    // Divide the array into k parts and sort each part recursively
+    // solve for k parts
     for (int i = 0; i < k; i++) {
         int start = low + i * part_size;
-        int end = min(start + part_size, high);
-
-        if (start < high) {
-            vector<int> sortedPart = mergeSort(arr, k, start, end);
-            sortedParts.push_back(sortedPart);
+        if (start >= high) {
+            break; 
         }
+        int end = min(start + part_size, high);
+        mergeSort(arr, k, start, end);
     }
 
-    // Merge the k sorted parts
-    return merge(sortedParts);
+    // merge all k sorted parts in the range [low, high) into one sorted segment
+    vector<int> merged = mergeParts(arr, k, part_size, low, high);
+
+    // copy the merged result back into arr
+    for (int i = 0; i < (int)merged.size(); i++) {
+        arr[low + i] = merged[i];
+    }
+
+    // return merged;
 }
 
 int main() {
     vector<int> arr;
     int n, k;
 
-    // Input array size and number of parts
     cout << "Enter the size of the array: ";
     cin >> n;
     cout << "Enter the number of parts (k): ";
     cin >> k;
 
-    // Validate input
-    if (n <= 0 || k <= 0) {
-        cout << "Invalid input. Size and k must be positive integers." << endl;
-        return 1;
-    }
-
-    if (k > n) {
-        cout << "Warning: k is larger than the array size. Setting k to " << n << "." << endl;
-        k = n;
-    }
-
-    // Input the array elements
     cout << "Enter the elements of the array: ";
     arr.resize(n);
     for (int i = 0; i < n; i++) {
         cin >> arr[i];
     }
 
-    // Perform K-way merge sort
-    vector<int> sortedArray = mergeSort(arr, k, 0, n);
+    // Perform k-way merge sort
+    mergeSort(arr, k, 0, n);
 
-    // Output the sorted array
+    // Print the final sorted array
     cout << "Sorted array: ";
-    for (int num : sortedArray) {
+    for (int num : arr) {
         cout << num << " ";
     }
     cout << endl;

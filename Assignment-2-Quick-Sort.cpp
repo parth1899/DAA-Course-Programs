@@ -6,17 +6,24 @@ using namespace std;
 
 // Quick Sort Implementation
 int partition(vector<int>& arr, int low, int high) {
-    int pivot = arr[high];
-    int i = low - 1;
+    int pivot = arr[low]; //first element
+    int i = low;
+    int j = high;
     
-    for(int j = low; j < high; j++) {
-        if(arr[j] <= pivot) {
+    while(i < j) {
+        while(arr[i] <= pivot && i <= high - 1) {
             i++;
-            swap(arr[i], arr[j]);
+            //find the first element from the left greater than pivot
         }
+        while(arr[j] > pivot && j >= low + 1) {
+            j--;
+            //find the first element from the right smaller than pivot
+        }
+        if(i < j) swap(arr[i], arr[j]);
     }
-    swap(arr[i + 1], arr[high]);
-    return i + 1;
+
+    swap(arr[low], arr[j]);
+    return j;
 }
 
 void quickSort(vector<int>& arr, int low, int high) {
@@ -35,7 +42,7 @@ void printArray(const vector<int>& arr) {
 }
 
 int main() {
-    int n, k;
+    int n;
     cout << "Enter the number of elements: ";
     cin >> n;
     

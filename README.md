@@ -25,3 +25,14 @@ A number is a **majority element** if it appears more than `n/2` times in an arr
 1. **Brute Force** – Counts occurrences for each element.  
 2. **Sorting-Based Approach** – Uses sorting to locate the majority element.  
 3. **Boyer-Moore Majority Voting Algorithm** – A space-efficient algorithm to find the majority element in `O(n)` time.  
+
+### **Assignment 6: Patience Sorting**  
+1. **Patience Sorting Algorithm** – Used to find the longest increasing subsequence in `O(n log n)`.  
+
+### **Assignment 7: Kadane's Algorithm for Maximum Contiguous Block Sum**  
+1. **Brute Force Approach** – Checks all subarrays to find the maximum sum.  
+2. **Optimized Brute Force** – Reduces redundant calculations for better performance.  
+3. **Kadane's Algorithm** – An efficient `O(n)` approach to find the maximum sum of a contiguous subarray.  
+
+### **Assignment 8: Kruskal's Algorithm for Minimum Spanning Tree (MST)**  
+1. **Kruskal's Algorithm** – A greedy algorithm to find the MST of a graph using the Union-Find data structure.  
